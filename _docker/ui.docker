@@ -1,26 +1,17 @@
-# Sử dụng Node >= 20.11
 FROM node:20.13-alpine
 
-# Cài bash và các gói cần thiết
-RUN apk update && \
-    apk add bash && \
-    npm install -g npm@latest
+RUN apk update && apk add bash
 
-# Cài Angular CLI global
+# (hoặc nếu cần nâng npm → chỉ nâng tới 10.5.2)
+# RUN apk update && apk add bash && npm install -g npm@10.5.2
+
 RUN npm install -g @angular/cli
 
-# Đặt thư mục làm việc
 WORKDIR /app
-
-# Copy package.json và cài đặt dependencies
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
-# Copy toàn bộ mã nguồn vào container
 COPY . .
 
-# Expose port Angular chạy
 EXPOSE 4200
-
-# Lệnh khởi động Angular (bắt buộc dùng host 0.0.0.0 để NGINX truy cập được)
 CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]

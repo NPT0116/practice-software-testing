@@ -1,27 +1,26 @@
-FROM node:18.19.0-alpine
+# Sử dụng Node >= 20.11
+FROM node:20.13-alpine
 
+# Cài bash và các gói cần thiết
 RUN apk update && \
     apk add bash && \
-    npm install -g npm@8.3.0
+    npm install -g npm@latest
 
-RUN npm install -s -g @angular/cli
-#    && \
-#    mkdir -p /app # Create a directory where our app will be placed
+# Cài Angular CLI global
+RUN npm install -g @angular/cli
 
-# Change directory so that our commands run inside this new directory
-#WORKDIR /app
+# Đặt thư mục làm việc
+WORKDIR /app
 
-# Copy dependency definitions
-#COPY package*.json /app/
+# Copy package.json và cài đặt dependencies
+COPY package*.json ./
+RUN npm install --legacy-peer-deps
 
-# Install dependencies
-# RUN npm install
+# Copy toàn bộ mã nguồn vào container
+COPY . .
 
-# Get all the code needed to run the app
-#COPY . /app/
-
-# Expose the port the app runs in
+# Expose port Angular chạy
 EXPOSE 4200
 
-# Serve the app
-CMD ["npm", "install --dev --legacy-peer-deps --force", "start"]
+# Lệnh khởi động Angular (bắt buộc dùng host 0.0.0.0 để NGINX truy cập được)
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]

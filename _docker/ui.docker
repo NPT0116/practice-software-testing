@@ -1,17 +1,20 @@
 FROM node:20.13-alpine
 
 RUN apk update && apk add bash
-
-# (hoặc nếu cần nâng npm → chỉ nâng tới 10.5.2)
-# RUN apk update && apk add bash && npm install -g npm@10.5.2
-
 RUN npm install -g @angular/cli
 
 WORKDIR /app
-COPY package*.json ./
+
+# Copy package.json và package-lock.json từ source Angular
+COPY angular-ui/package*.json ./
+
+# Cài dependencies
 RUN npm install --legacy-peer-deps
 
-COPY . .
+# Copy toàn bộ mã nguồn Angular vào container
+COPY angular-ui/ ./
 
 EXPOSE 4200
+
+# Run Angular dev server
 CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
